@@ -7,6 +7,11 @@ from email.mime.text import MIMEText
 from email.header import Header   
 import smtplib, poplib, email
 
+g_emailaddr = u"xx_abcde10000@sina.cn"
+g_emailpwd = u"qazwsx10000"
+g_smtpserver = u"smtp.sina.cn"
+g_popserver = u"pop.sina.cn"
+
 def getActiveKey():
     element = u"@@@"
     hostname = SysInfo.getHostName()
@@ -18,12 +23,12 @@ def getActiveKey():
 
 def doActive(items):
     try:
-        emailaddr = u"@sina.cn"
-        emailpwd = u""
+        emailaddr = g_emailaddr
+        emailpwd = g_emailpwd
         sender =  emailaddr
         receiver = emailaddr
         subject = u"[tbsearch-active]"
-        smtpserver = u"smtp.sina.com"
+        smtpserver = g_smtpserver
         username = emailaddr
         password = emailpwd
 
@@ -35,23 +40,33 @@ def doActive(items):
         msg['To'] = receiver
          
         smtp = smtplib.SMTP() 
-        smtp.connect('smtp.sina.com') 
+        smtp.connect(g_smtpserver) 
         smtp.login(username, password) 
         smtp.sendmail(sender, receiver, msg.as_string()) 
         smtp.quit()
     except:
         traceStr = traceback.format_exc()
         logging.error(traceStr)
-    
+
+def doActiveFile(activePath):
+    try:
+        f = open(activePath, u"rb")
+        items = f.read()
+        doActive(items)
+        f.close()
+    except:
+        traceStr = traceback.format_exc()
+        logging.error(traceStr)        
+   
 def requestActive(key):
     try:
-        emailaddr = u"@sina.cn"
-        emailpwd = u""
+        emailaddr = g_emailaddr
+        emailpwd = g_emailpwd
         thistime = datetime.datetime.now()
         sender =  emailaddr
         receiver = emailaddr
         subject = xstring.str2unicode(str(thistime)) + u"[" + xstring.str2unicode(SysInfo.getHostName()) + u"]"
-        smtpserver = u"smtp.sina.com"
+        smtpserver = g_smtpserver
         username = emailaddr
         password = emailpwd
 
@@ -72,7 +87,7 @@ def requestActive(key):
         msg['To'] = receiver
          
         smtp = smtplib.SMTP() 
-        smtp.connect('smtp.sina.com') 
+        smtp.connect(g_smtpserver) 
         smtp.login(username, password) 
         smtp.sendmail(sender, receiver, msg.as_string()) 
         smtp.quit()
@@ -108,9 +123,9 @@ def getActiveMailContent(mail):
 def getActiveValue(key, softname):
     value = None
     try:
-        host = 'pop.sina.com'  
-        username = u"@sina.cn"  
-        password = u""  
+        host = g_popserver  
+        username = g_emailaddr 
+        password = g_emailpwd 
           
         pop_conn = poplib.POP3(host)   
         pop_conn.user(username)   
@@ -132,10 +147,12 @@ def getActiveValue(key, softname):
 
         if activemail != None:
             content = getActiveMailContent(activemail)
-            items = content.split(u"\r\n")
+            items = content.split(u"\n")
             dic = {}
             for item in items:
                 if item!=u"":
+                    if item[-1] == u"\r":
+                        item = item[0:-1]
                     keyvalue = item.split(u"===>")
                     if len(keyvalue) == 2:
                         dic[keyvalue[0]] = keyvalue[1]
