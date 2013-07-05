@@ -1,6 +1,6 @@
 #coding=GBK
 
-import wmi 
+import wmi, traceback
 import os 
 import sys 
 import platform 

@@ -7,10 +7,14 @@ from email.mime.text import MIMEText
 from email.header import Header   
 import smtplib, poplib, email
 
-g_emailaddr = u"xx_abcde10000@sina.cn"
-g_emailpwd = u"qazwsx10000"
+g_emailaddr = u"@sina.cn"
+g_emailpwd = u""
 g_smtpserver = u"smtp.sina.cn"
 g_popserver = u"pop.sina.cn"
+global g_isGetValue
+global g_value
+g_isGetValue = False
+g_value = None
 
 def getActiveKey():
     element = u"@@@"
@@ -166,15 +170,28 @@ def getActiveValue(key, softname):
 def isActive(softname):
     isactive = False
     try:
-        key = getActiveKey()
-        value = getActiveValue(key, softname)
-        if value != None:
-            t = time.strptime(value, "%Y-%m-%d %X")
-            d = datetime.datetime(* t[:6]) 
-            dnow = datetime.datetime.now()
-            deltaSec = (dnow-d).days
-            if d >= dnow:
-                isactive = True
+        global g_isGetValue
+        global g_value
+        if g_isGetValue==False:
+            g_isGetValue = True
+            key = getActiveKey()
+            value = getActiveValue(key, softname)
+            if value != None:
+                t = time.strptime(value, "%Y-%m-%d %X")
+                d = datetime.datetime(* t[:6])
+                g_value = d
+                dnow = datetime.datetime.now()
+                if g_value >= dnow:
+                    isactive = True
+            else:
+                g_value = None
+        else:
+            if g_value == None:
+                isactive = False
+            else:
+                dnow = datetime.datetime.now()
+                if g_value >= dnow:
+                    isactive = True
     except:
         isactive = False
         traceStr = traceback.format_exc()
