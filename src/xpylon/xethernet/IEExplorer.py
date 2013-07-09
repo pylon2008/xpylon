@@ -3,6 +3,7 @@ import win32gui, win32api
 import win32com.client, os
 import time, datetime, traceback, logging, pywintypes
 from win32com.shell import shell, shellcon
+from xpylon.xutil.Process import *
 
 # 获取屏幕的宽、高
 ##width = win32api.GetSystemMetrics(win32con.SM_CXSCREEN)
@@ -69,6 +70,12 @@ def closeAllRunningIE():
                 a = 0
     except:
         logging.error("closeAllRunningIE exception")
+        traceStr = traceback.format_exc()
+        logging.error(traceStr)
+
+    try:
+        killProcess(u"iexplore.exe")
+    except:
         traceStr = traceback.format_exc()
         logging.error(traceStr)
 

@@ -8,7 +8,10 @@ def str2unicode(string):
     uniStr = u""
     if isinstance(string, unicode):
         uniStr = string
+    elif isinstance(string, str):
+        if len(string) > 0:
+            result = chardet.detect(string)
+            uniStr = string.decode(result["encoding"])
     else:
-        result = chardet.detect(string)
-        uniStr = string.decode(result["encoding"])
+        raise TypeError, "str2unicode input type error"
     return uniStr
