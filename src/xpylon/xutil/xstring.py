@@ -18,7 +18,6 @@ def str2unicode(string):
 
 def clearDuplicateSpace(value):
     tvalue = value.replace(u"\t", u" ")
-    print u"\t" in tvalue
     values = tvalue.split(u" ")
     newValue = u""
     for i in values:
