@@ -16,6 +16,8 @@ global g_value
 g_isGetValue = False
 g_value = None
 
+
+
 def getActiveKey():
     element = u"@@@"
     hostname = SysInfo.getHostName()
@@ -23,6 +25,7 @@ def getActiveKey():
     macs = SysInfo.getEnableMacs()
     cpu = SysInfo.getCpuName()
     strSelfInfo = element + hostname + element + platformStr + element + macs + element + cpu + element
+    strSelfInfo = xstring.clearDuplicateSpace(strSelfInfo)
     return strSelfInfo
 
 def doActive(items):
