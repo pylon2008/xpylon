@@ -1,5 +1,5 @@
 # coding=GBK
-import win32gui, win32api
+import win32gui, win32api, win32process, win32con
 import win32com.client, os
 import time, datetime, traceback, logging, pywintypes
 from win32com.shell import shell, shellcon
@@ -160,6 +160,7 @@ class IEExplorer(object):
         self.ie = None
         self.oldURL = ""
         self.timeBegOp = None                   # 开始操作宝贝的起点时间，从开始滚动开始
+        self.IEHandle = None
 
     def newIE(self, url):  
         self.ie = win32com.client.Dispatch("InternetExplorer.Application")
@@ -169,6 +170,7 @@ class IEExplorer(object):
         self.ie = existIE(url)
         if self.ie == None:
             self.newIE(url)
+        self.IEHandle = self.getIEHandle()
         #self.setForeground()
 
     def navigate(self, url):
@@ -233,20 +235,40 @@ class IEExplorer(object):
         return self.ie
 
     def getIEHandle(self):
-        debugInfo = "type(self.ie.hwnd): " + str(type(self.ie.hwnd)) \
-                    + ", self.ie.hwnd: " + str(self.ie.hwnd)
-        logging.debug(debugInfo)
-        PyHANDLE = pywintypes.HANDLE(self.ie.hwnd)
-        return PyHANDLE
+        if self.IEHandle == None:
+            debugInfo = "type(self.ie.hwnd): " + str(type(self.ie.hwnd)) \
+                        + ", self.ie.hwnd: " + str(self.ie.hwnd)
+            logging.debug(debugInfo)
+            self.IEHandle = pywintypes.HANDLE(self.ie.hwnd)
+        return self.IEHandle
 
     def setForeground(self):
-        win32gui.SetForegroundWindow(self.getIEHandle())
+        #preshell = win32com.client.Dispatch("WScript.Shell")        
+        #preshell.SendKeys(u'%')
+        #ieHandle = self.getIEHandle()
+        #win32gui.SetForegroundWindow(ieHandle)
+        
+        forcegroundWindow = win32gui.GetForegroundWindow()
+        forcegroundThreadId, forcegroundProcessId = win32process.GetWindowThreadProcessId(forcegroundWindow)
+        appThreadId = win32api.GetCurrentThreadId()
+        if appThreadId != forcegroundThreadId:
+            win32process.AttachThreadInput(forcegroundThreadId, appThreadId, True)
+            ieHandle = self.getIEHandle()
+            win32gui.BringWindowToTop(ieHandle)
+            win32gui.ShowWindow(ieHandle, win32con.SW_SHOW)
+            win32process.AttachThreadInput(forcegroundThreadId, appThreadId, False)
+        else:
+            ieHandle = self.getIEHandle()
+            win32gui.BringWindowToTop(ieHandle)
+            win32gui.ShowWindow(ieHandle, win32con.SW_SHOW)
+            
 
     def resizeMax(self):
         WM_SYSCOMMAND = int('112', 16)
         SC_MINIMIZE = int('F020', 16)
-        SC_MAXIMIZE = int('F030', 16)        
-        win32api.SendMessage(self.getIEHandle(), WM_SYSCOMMAND, SC_MAXIMIZE, 0)
+        SC_MAXIMIZE = int('F030', 16)
+        ieHandle = self.getIEHandle()
+        win32api.SendMessage(ieHandle, WM_SYSCOMMAND, SC_MAXIMIZE, 0)
     
     def getBody(self):
         return self.ie.Document.body
