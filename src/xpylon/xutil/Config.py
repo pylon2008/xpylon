@@ -1,5 +1,6 @@
 #coding = GBK
 import logging
+from xpylon.xutil.xstring import *
 
 class ConfigIni(object):
     def __init__(self, iniPath):

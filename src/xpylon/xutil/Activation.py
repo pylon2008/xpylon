@@ -7,7 +7,7 @@ from email.mime.text import MIMEText
 from email.header import Header   
 import smtplib, poplib, email
 
-g_emailaddr = u"@sina.cn"
+g_emailaddr = u""
 g_emailpwd = u""
 g_smtpserver = u"smtp.sina.cn"
 g_popserver = u"pop.sina.cn"

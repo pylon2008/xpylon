@@ -1,4 +1,4 @@
-# coding=GBK
+#coding=GBK
 import win32gui, win32api, win32process, win32con
 import win32com.client, os
 import time, datetime, traceback, logging, pywintypes
@@ -15,6 +15,16 @@ IE_INTERVAL_TIME_CLOSE = 1
 IE_INTERVAL_TIME_SACROLL = 0.08
 IE_TIME_OUT_SCROLL = 4
 IE_TIME_OUT_NEW_PAGE = 15
+
+def getScrollDelta():
+    baseScrollDelta = [20,30,40,50,60,70]
+    zoom = 3.0
+    scrollDelta = []
+    for i in baseScrollDelta:
+        value = i * zoom
+        value = (int)(value)
+        scrollDelta.append(value)
+    return scrollDelta
 
 def deleteFileFolder(src):
     '''delete files and folders'''
@@ -299,7 +309,7 @@ class IEExplorer(object):
 
     def scrollToNode(self, node):
         scrollDirection = getScrollDirection(node, self)
-        scrollDelta = [20,30,40,50,60,70]
+        scrollDelta = getScrollDelta()
         isIn = False
         timeBeg = datetime.datetime.now()
 
@@ -329,7 +339,7 @@ class IEExplorer(object):
             oldClient = newClient
 
     def stayInSubPage(self, timeOut):
-        scrollDelta = [20,30,40,50,60,70]
+        scrollDelta = getScrollDelta()
         a = datetime.datetime.now()
         self.timeBegOp = a
         while True:

@@ -6,7 +6,6 @@ import time, logging
 #import xpylon.xutil.Config
 from xpylon.xutil.Config import *
 
-TIME_AFTER_DISCONNECT = 27
 TIME_AFTER_CONNECT = 3
 
 ##netsh interface show interface
@@ -220,7 +219,11 @@ class NetManager(object):
         self.tpLink = TPLinkReset()
         self.netType = None
         self.timeout = 60
+        self.dialTimeBefore = 27
 
+    def setDialTimeBefore(self, time):
+        self.dialTimeBefore = (int)(time)
+        
     def setEthernetInfo(self, netType, ethernetName, userName, password, timeout = 60):
         self.netType = netType
         self.timeout = timeout 
@@ -244,7 +247,7 @@ class NetManager(object):
         disConResult = self.dialor.disconnect()
         disConResult = "disConResult:\r\n" + disConResult + "\r\n"
         disConResult = disConResult.decode("GBK")
-        time.sleep(TIME_AFTER_DISCONNECT)
+        time.sleep(self.dialTimeBefore)
         conResult = self.dialor.connect()
         conResult = "conResult:\r\n" + conResult + " "
         conResult = conResult.decode("GBK")
